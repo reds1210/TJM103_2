@@ -17,6 +17,7 @@ namespace TJM103.Models.Entity
 
         public int Stock { get; set; }
 
+        //fix
         public DateTime CreateDate { get; set; } = DateTime.Now;
     }
 }
