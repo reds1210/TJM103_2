@@ -7,17 +7,12 @@ namespace TJM103.Models.Entity
     {
         [Key] // 設定為主鍵
         public int Id { get; set; }
+        public string Title { get; set; }
+        public string Desc { get; set; }
+        public string Category { get; set; }
+        public int Price { get; set; }
+        public string Pic { get; set; }
+        public bool IsSell { get; set; }
 
-        [Required] // 不可為空
-        [MaxLength(100)] // 限制字串長度
-        public string Name { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")] // 指定 SQL Server 中的精確度
-        public decimal Price { get; set; }
-
-        public int Stock { get; set; }
-
-        //fix
-        public DateTime CreateDate { get; set; } = DateTime.Now;
     }
 }

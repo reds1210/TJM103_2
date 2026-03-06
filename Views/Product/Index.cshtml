@@ -1,0 +1,208 @@
+﻿<div id="product">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <div class="list-group">
+                    <div class="list-group-item list-group-item-action">
+                        <input type="text" v-model.trim="searchText">
+                    </div>
+                    <div class="list-group-item list-group-item-action">
+                        <select @@change="selectCategory">
+                            <option value="0">ALL</option>
+                            <option v-bind:value="item" v-for="item in productCategory">{{item}}</option>
+                        </select>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" v-model="sw" value="true" type="checkbox" role="switch"
+                               id="switch1">
+                        <label class="form-check-label" for="switch1">進階搜尋</label>
+                    </div>
+                    <a href="https://www.google.com" @@click.prevent="test">click me</a>
+                    <button @@click.once="test">抽獎</button>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" v-model="checkedType" value="new" type="checkbox"
+                               role="switch" id="switchCheckDefault">
+                        <label class="form-check-label" for="switchCheckDefault">全新品</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" v-model="checkedType" value="chicken" type="checkbox"
+                               role="switch" id="switchCheckDefault1">
+                        <label class="form-check-label" for="switchCheckDefault1">有機</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" v-model="checkedType" value="poor" type="checkbox"
+                               role="switch" id="switchCheckDefault2">
+                        <label class="form-check-label" for="switchCheckDefault2">小農</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" v-model="checkedType" value="rich" type="checkbox"
+                               role="switch" id="switchCheckDefault3">
+                        <label class="form-check-label" for="switchCheckDefault3">你買不起</label>
+                    </div>
+                    <template v-if="sw">
+                        <div>
+                            超級進階
+                        </div>
+                        <div>
+                            第二個區塊
+                        </div>
+                    </template>
+
+                    <template v-else>
+                        <div>
+                            一般使用者看到的
+                        </div>
+                        <div>
+                            原始區塊
+                        </div>
+                    </template>
+
+                    <hr>
+                    <div v-if="searchText =='a'">關鍵字A</div>
+                    <div v-else-if="searchText =='b'">關鍵字B</div>
+                    <div v-else>沒關鍵字</div>
+
+                    <hr>
+                    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+                        Button with data-bs-target
+                    </button>
+                </div>
+            </div>
+            <div class="col-8">
+                <div class="row">
+                    <div class="card col-3 " v-for="product in filterPrdocutCategory">
+                        <img :src="product.pic" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">{{product.title}}</h5>
+                            <p class="card-text">{{product.desc}}</p>
+                            <button href="#" class="btn" v-bind:class="show(product.price)"
+                                    @@click="addCart(product)"
+                                    v-bind:disabled="product.price>100">
+                                {{product.price}}
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample"
+         aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ol class="list-group list-group-numbered">
+                <li v-for="item in carts" class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">品名:{{item.title}}</div>
+                        {{item.desc}}
+                    </div>
+                    <div class="me-2">
+                        <div class="fw-bold">數量:{{item.count}}</div>
+                        <button @@click="deleteCart(item)" class="btn btn-danger">刪除</button>
+                    </div>
+                    <!-- <span class="badge text-bg-primary rounded-pill">14</span> -->
+                </li>
+            </ol>
+        </div>
+    </div>
+
+
+</div>
+
+@section Scripts
+{
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    carts: [],
+                    sw: true,
+                    checkedType: [],
+                    searchText: "",
+                    selectVal: "0",
+                    products: []
+                }
+            },
+            methods: {
+                deleteCart(prod){
+                    var idx = this.carts.findIndex(x => x.title == prod.title);
+                    this.carts.splice(idx,1);
+                },
+                show(price) {
+                    return price > 100 ? 'btn-danger' : 'btn-primary';
+                },
+                test() {
+                    console.log("hi")
+                },
+                selectCategory(e, val) {
+                    console.log(e.target.value, val)
+                    this.selectVal = e.target.value;
+                },
+                addCart(prod) {
+                    var idx = this.carts.findIndex(x => x.title == prod.title);
+                    if (idx == -1) {
+                        this.carts.push({ ...prod, count: 1 });
+                    } else {
+                        this.carts[idx].count++;
+                    }
+
+                }
+            },
+            watch: {
+                carts: {
+                    handler(newValue, oldVlaue) {
+                        localStorage.setItem("carts", JSON.stringify(newValue));
+                    },
+                    deep: true
+                },
+                searchText(newValue, oldVlaue) {
+                    console.log(newValue);
+                },
+            },
+            computed: {
+                filterPrdocutText() {
+                    var text = this.searchText;
+                    return this.products.filter(pod => pod.title.toLowerCase().includes(text.toLowerCase()));
+                },
+                filterPrdocutCategory() {
+                    var category = this.selectVal;
+                    if (category !== "0") {
+                        return this.filterPrdocutText.filter(prod => prod.category == category);
+                    }
+                    return this.filterPrdocutText;
+
+                },
+                productCategory() {
+                    return [...new Set(this.products.map(x => x.category))]
+                }
+            },
+            beforeCreate() {
+                console.log("beforeCreate", this.carts)
+            },
+            created() {
+                console.log("created", this.carts)
+                var str = localStorage.getItem("carts");
+                var arr = JSON.parse(str);
+                this.carts = arr || [];
+            },
+            mounted() {
+                console.log("mounted", this.carts)
+                var self = this;
+                fetch("/api/product/get").then(x=> x.json()).then(res=>{
+
+                    self.products = res;
+                    console.log(self.products,res);
+                })
+            }
+        }).mount("#product");
+
+    </script>
+}
+
+
